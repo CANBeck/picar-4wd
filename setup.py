@@ -187,7 +187,7 @@ PIP_INSTALL_LIST = [
 
 def install():
     user_name = getlogin()
-
+    
     if "--no-dep" not in options:
         print("Install dependencies with apt-get")
         do(msg="update apt-get",
@@ -199,7 +199,7 @@ def install():
         print("Install dependencies with pip3")
         for dep in PIP_INSTALL_LIST:
             do(msg=f"install {dep}",
-                cmd=f'run_command("pip3 install {dep}")')
+                cmd=f'run_command("pip3 install --break-system-packages {dep}")')
 
     print("Setup interfaces")
     do(msg="turn on I2C",

@@ -143,7 +143,8 @@ async def main_logic_2(websocket,path):
     while 1:
         await send_server_func(websocket)
 
-try:
+async def main():
+    ip = None
     for _ in range(10):
         ip = getIP()
         if ip:
@@ -151,13 +152,25 @@ try:
             # start_http_server()
             break
         time.sleep(1)
-    start_server_1 = websockets.serve(main_logic_1, ip, 8765)
-    start_server_2 = websockets.serve(main_logic_2, ip, 8766)
+
+    start_server_1 = await websockets.serve(main_logic_1, ip, 8765)
+    start_server_2 = await websockets.serve(main_logic_2, ip, 8766)
+
     print('Start!')
-    tasks = [main_func(),start_server_1,start_server_2]
-    asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
-    asyncio.get_event_loop().run_forever()
- 
+    tasks = [main_func(),start_server_1.wait_closed(),start_server_2.wait_closed()]
+
+    #loop = asyncio.get_event_loop()
+    #task_objects = [loop.create_task(task) for task in tasks]
+    #loop.run_until_complete(asyncio.gather(*task_objects))
+    #loop.run_forever()
+    
+    await asyncio.gather(*tasks)
+
+    #asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
+    #asyncio.get_event_loop().run_forever()
+
+try:
+    asyncio.run(main())
 finally:
     print("Finished")
     fc.stop()
